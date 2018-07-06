@@ -1,57 +1,60 @@
 /* LGPL - Copyright 2017-2018 - wargio */
 #include "vle.h"
-#include "vle_internal.h"
 #include <stdlib.h>
+#include <stdint.h>
 #include <stdio.h>
 
-#define PFMT64x "llx"
+#define PFMT64x "lx"
 
-#define E_NONE  0
-#define E_X     1
-#define E_XL    2
-#define E_D     3
-#define E_D8    4
-#define E_I16A  5
-#define E_SCI8  6
-#define E_SCI8I 7
-#define E_I16L  8
-#define E_I16LS 9
-#define E_BD24  10
-#define E_BD15  11
-#define E_IA16  12
-#define E_LI20  13
-#define E_M     14
-#define E_XCR   15
-#define E_XLSP  16
+enum e_encoding_type {
+  E_NONE  = 0,
+  E_X     = 1,
+  E_XL    = 2,
+  E_D     = 3,
+  E_D8    = 4,
+  E_I16A  = 5,
+  E_SCI8  = 6,
+  E_SCI8I = 7,
+  E_I16L  = 8,
+  E_I16LS = 9,
+  E_BD24  = 10,
+  E_BD15  = 11,
+  E_IA16  = 12,
+  E_LI20  = 13,
+  E_M     = 14,
+  E_XCR   = 15,
+  E_XLSP  = 16
+};
 
 #define E_MASK_X    0x03FFF800
 #define E_MASK_XL   0x03FFF801
-#define E_MASK_D    0x01FFFFFF
+#define E_MASK_D    0x03FFFFFF
 #define E_MASK_D8   0x03FF00FF
 #define E_MASK_I16A 0x03FF07FF
 #define E_MASK_SCI8 0x03FF07FF
 #define E_MASK_I16L 0x03FF07FF
-#define E_MASK_BD24 0x03FFFFFE
+#define E_MASK_BD24 0x01FFFFFE
 #define E_MASK_BD15 0x000CFFFE
 #define E_MASK_IA16 0x03FF07FF
 #define E_MASK_LI20 0x03FF7FFF
 #define E_MASK_M    0x03FFFFFE
 
-#define F_NONE  0
-#define F_X     1
-#define F_XO    2
-#define F_EVX   3
-#define F_CMP   4
-#define F_DCBF  5
-#define F_DCBL  6
-#define F_DCI   7
-#define F_EXT   8
-#define F_A     9
-#define F_XFX  10
-#define F_XER  11
-#define F_MFPR 12
-#define F_MTPR 13
-
+enum f_encoding_type {
+  F_NONE = 0,
+  F_X    = 1,
+  F_XO   = 2,
+  F_EVX  = 3,
+  F_CMP  = 4,
+  F_DCBF = 5,
+  F_DCBL = 6,
+  F_DCI  = 7,
+  F_EXT  = 8,
+  F_A    = 9,
+  F_XFX  = 10,
+  F_XER  = 11,
+  F_MFPR = 12,
+  F_MTPR = 13
+};
 
 #define F_MASK_X     0x03FFF800
 #define F_MASK_XO    0x03FFF800
@@ -66,6 +69,39 @@
 #define F_MASK_XER   0x03FFF800
 #define F_MASK_MFPR  0x03FFF800
 #define F_MASK_MTPR  0x03FFF800
+
+typedef struct {
+	uint16_t mask;
+	uint16_t shr;
+	uint16_t shl;
+	uint16_t add;
+	uint8_t idx;
+	enum field_type type;
+} field_t;
+
+typedef struct {
+	const char* name;
+	uint32_t op;
+	uint32_t mask;
+	enum e_encoding_type type;
+	enum field_type types[5];
+} e_vle_t;
+
+typedef struct {
+	const char* name;
+	uint16_t op;
+	uint16_t mask;
+	uint16_t n;
+	field_t fields[5];
+} se_vle_t;
+
+typedef struct {
+	const char* name;
+	uint32_t op;
+	uint32_t mask;
+	enum f_encoding_type type;
+	enum field_type types[5];
+} ppc_t;
 
 
 const ppc_t ppc_ops[] = {
@@ -174,9 +210,11 @@ const ppc_t ppc_ops[] = {
 	{ "msync"      , 0x7C0004AC, 0x7C0004AC | F_MASK_XFX ,   F_XFX, {TYPE_NONE, TYPE_NONE, TYPE_NONE, TYPE_NONE, TYPE_NONE}},
 	{ "tlbre"      , 0x7C000764, 0x7C000764 | F_MASK_XFX ,  F_NONE, {TYPE_NONE, TYPE_NONE, TYPE_NONE, TYPE_NONE, TYPE_NONE}},
 	{ "tlbwe"      , 0x7C0007A4, 0x7C0007A4 | F_MASK_XFX ,  F_NONE, {TYPE_NONE, TYPE_NONE, TYPE_NONE, TYPE_NONE, TYPE_NONE}},
-	{ "stwx"       , 0x7C00012E, 0x7C00012E | E_MASK_XL  ,   E_XL , {TYPE_REG, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
-	{ "mfcr"       , 0x7C000026, 0x7C000026 | E_MASK_XL  ,   E_XL , {TYPE_REG, TYPE_NONE, TYPE_NONE, TYPE_NONE, TYPE_NONE}},
-	{ "mtcrf"      , 0x7C000120, 0x7C000120 | E_MASK_XL  ,   E_XL , {TYPE_REG, TYPE_IMM, TYPE_NONE, TYPE_NONE, TYPE_NONE}}, //crf rossz
+  // TODO: ERM, these won't actually go through the E_XL codepatH?
+  // they'll actually get picked up as F_XO
+	{ "stwx"       , 0x7C00012E, 0x7C00012E | E_MASK_XL  ,   F_XO , {TYPE_REG, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
+	{ "mfcr"       , 0x7C000026, 0x7C000026 | E_MASK_XL  ,   F_XO , {TYPE_REG, TYPE_NONE, TYPE_NONE, TYPE_NONE, TYPE_NONE}},
+	{ "mtcrf"      , 0x7C000120, 0x7C000120 | E_MASK_XL  ,   F_XO , {TYPE_REG, TYPE_IMM, TYPE_NONE, TYPE_NONE, TYPE_NONE}}, //crf rossz
 }; 
 
 const e_vle_t e_ops[] = {
@@ -230,8 +268,8 @@ const e_vle_t e_ops[] = {
 	{ "e_beqctrl"  , 0x7A000001, 0x7A330001 | E_MASK_BD15, E_BD15 , {TYPE_CR, TYPE_IMM, TYPE_NONE, TYPE_NONE, TYPE_NONE}},
 	{ "e_bsoctrl"  , 0x7A000001, 0x7A340001 | E_MASK_BD15, E_BD15 , {TYPE_CR, TYPE_IMM, TYPE_NONE, TYPE_NONE, TYPE_NONE}},
 	{ "e_bcctrl"   , 0x7A000001, 0x7A340001 | E_MASK_BD15, E_BD15 , {TYPE_CR, TYPE_IMM, TYPE_NONE, TYPE_NONE, TYPE_NONE}},
-	{ "e_b"        , 0x78000000, 0x78000000 | E_MASK_BD24, E_BD24 , {TYPE_IMM, TYPE_NONE, TYPE_NONE, TYPE_NONE, TYPE_NONE}},
-	{ "e_bl"       , 0x78000001, 0x78000001 | E_MASK_BD24, E_BD24 , {TYPE_IMM, TYPE_NONE, TYPE_NONE, TYPE_NONE, TYPE_NONE}},
+	{ "e_b"        , 0x78000000, 0x78000000 | E_MASK_BD24, E_BD24 , {TYPE_JMP, TYPE_NONE, TYPE_NONE, TYPE_NONE, TYPE_NONE}},
+	{ "e_bl"       , 0x78000001, 0x78000001 | E_MASK_BD24, E_BD24 , {TYPE_JMP, TYPE_NONE, TYPE_NONE, TYPE_NONE, TYPE_NONE}},
 	{ "e_cmp16i"   , 0x70009800, 0x70009800 | E_MASK_IA16, E_IA16 , {TYPE_IMM, TYPE_REG, TYPE_IMM, TYPE_NONE, TYPE_NONE}},
 	{ "e_cmph16i"  , 0x7000B000, 0x7000B000 | E_MASK_IA16, E_IA16 , {TYPE_IMM, TYPE_REG, TYPE_IMM, TYPE_NONE, TYPE_NONE}},
 	{ "e_cmph"     , 0x7C00001C, 0x7C00001D | E_MASK_X   , E_XCR  , {TYPE_CR, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
@@ -364,7 +402,7 @@ const se_vle_t se_ops[] = {
 	{ "se_subi."  , 0x2600, 0x27FF, 2, {{0x01F0,  4,  0,  1, 1, TYPE_IMM}, {0x000F,  0,  0,  0,  0, TYPE_REG}, {0}, {0}, {0}}},
 };
 
-static void set_e_fields(vle_t * v, const e_vle_t* p, ut32 data) {
+static void set_e_fields(vle_t * v, const e_vle_t* p, uint32_t data) {
 	if (!v) {
 		return;
 	}
@@ -440,9 +478,9 @@ static void set_e_fields(vle_t * v, const e_vle_t* p, ut32 data) {
 			v->fields[0].type = p->types[0];
 			v->fields[1].value = (data & 0x1F0000) >> 16;
 			v->fields[1].type = p->types[1];
-			ut32 ui8 = data & 0xFF;
-			ut32 scl = (data & 0x300) >> 8;
-			ut32 f = data & 0x400;
+			uint32_t ui8 = data & 0xFF;
+			uint32_t scl = (data & 0x300) >> 8;
+			uint32_t f = data & 0x400;
 			switch (scl) {
 				case 0:
 					v->fields[2].value = ui8 | (f ? 0xffffff00 : 0);
@@ -467,9 +505,9 @@ static void set_e_fields(vle_t * v, const e_vle_t* p, ut32 data) {
 			v->fields[1].type = p->types[0];
 			v->fields[0].value = (data & 0x1F0000) >> 16;
 			v->fields[0].type = p->types[1];
-			ut32 ui8 = data & 0xFF;
-			ut32 scl = (data & 0x300) >> 8;
-			ut32 f = data & 0x400;
+			uint32_t ui8 = data & 0xFF;
+			uint32_t scl = (data & 0x300) >> 8;
+			uint32_t f = data & 0x400;
 			switch (scl) {
 				case 0:
 					v->fields[2].value = ui8 | (f ? 0xffffff00 : 0);
@@ -494,7 +532,7 @@ static void set_e_fields(vle_t * v, const e_vle_t* p, ut32 data) {
 			v->fields[0].type = p->types[0];
 			v->fields[1].value = (data & 0x1F0000) >> 5;
 			v->fields[1].value |= (data & 0x7FF);
-			if (v->fields[1].value & 0x8000) {
+			if (v->fields[1].value & 0x4000) {
 				v->fields[1].value = 0xFFF8000 | v->fields[1].value;
 			}
 			v->fields[1].type = p->types[1];
@@ -507,7 +545,7 @@ static void set_e_fields(vle_t * v, const e_vle_t* p, ut32 data) {
 			v->fields[0].type = p->types[0];
 			v->fields[1].value = (data & 0x1F0000) >> 5;
 			v->fields[1].value |= (data & 0x3FF);
-			if (v->fields[1].value & 0x4000) {
+			if (v->fields[1].value & 0x8000) {
 				v->fields[1].value = 0xFFF8000 | v->fields[1].value;
 			}
 			v->fields[1].type = p->types[1];
@@ -516,9 +554,9 @@ static void set_e_fields(vle_t * v, const e_vle_t* p, ut32 data) {
 		case E_BD24:
 		{
 			v->n = 1;
-			v->fields[0].value = data & 0x3FFFFFE;
-			if (v->fields[0].value & 0x3000000) {
-				v->fields[0].value |= 0xFC000000;
+			v->fields[0].value = data & 0x1FFFFFE;
+			if (v->fields[0].value & 0x1000000) {
+				v->fields[0].value |= 0xFE000000;
 			}
 			v->fields[0].type = p->types[0];
 		}
@@ -591,7 +629,7 @@ static void set_e_fields(vle_t * v, const e_vle_t* p, ut32 data) {
 	}
 }
 
-static void set_ppc_fields(vle_t * v, const ppc_t* p, ut32 data) {
+static void set_ppc_fields(vle_t * v, const ppc_t* p, uint32_t data) {
 	if (!v) {
 		return;
 	}
@@ -720,15 +758,14 @@ static void set_ppc_fields(vle_t * v, const ppc_t* p, ut32 data) {
 	}
 }
 
-static vle_t *find_ppc(const ut8* buffer) {
-	ut32 i;
-	ut32 data = (buffer[0] << 24) | (buffer[1] << 16) | (buffer[2] << 8) | buffer[3];
+static vle_t *find_ppc(const uint8_t* buffer, vle_t* ret) {
+	uint32_t i;
+	uint32_t data = (buffer[0] << 24) | (buffer[1] << 16) | (buffer[2] << 8) | buffer[3];
 	const ppc_t* p = NULL;
-	const ut32 size = sizeof (ppc_ops) / sizeof (ppc_t);
+	const uint32_t size = sizeof (ppc_ops) / sizeof (ppc_t);
 	for (i = 0; i < size; ++i) {
 		p = &ppc_ops[i];
 		if ((p->op & data) == p->op && (p->mask & data) == data) {
-			vle_t* ret = (vle_t*) calloc(1, sizeof(vle_t));
 			ret->name = p->name;
 			ret->size = 4;
 			ret->n = 0;
@@ -739,15 +776,14 @@ static vle_t *find_ppc(const ut8* buffer) {
 	return NULL;
 }
 
-static vle_t *find_e(const ut8* buffer) {
-	ut32 i;
-	ut32 data = (buffer[0] << 24) | (buffer[1] << 16) | (buffer[2] << 8) | buffer[3];
+static vle_t *find_e(const uint8_t* buffer, vle_t* ret) {
+	uint32_t i;
+	uint32_t data = (buffer[0] << 24) | (buffer[1] << 16) | (buffer[2] << 8) | buffer[3];
 	const e_vle_t* p = NULL;
-	const ut32 size = sizeof (e_ops) / sizeof (e_vle_t);
+	const uint32_t size = sizeof (e_ops) / sizeof (e_vle_t);
 	for (i = 0; i < size; ++i) {
 		p = &e_ops[i];
 		if ((p->op & data) == p->op && (p->mask & data) == data) {
-			vle_t* ret = (vle_t*) calloc(1, sizeof(vle_t));
 			ret->name = p->name;
 			ret->size = 4;
 			ret->n = 0;
@@ -758,15 +794,14 @@ static vle_t *find_e(const ut8* buffer) {
 	return NULL;
 }
 
-static vle_t *find_se(const ut8* buffer) {
-	ut32 i, j, k;
-	ut16 data = (buffer[0] << 8) | buffer[1];
+static vle_t *find_se(const uint8_t* buffer, vle_t* ret) {
+	uint32_t i, j, k;
+	uint16_t data = (buffer[0] << 8) | buffer[1];
 	const se_vle_t* p = NULL;
-	const ut32 size = sizeof (se_ops) / sizeof (se_vle_t);
+	const uint32_t size = sizeof (se_ops) / sizeof (se_vle_t);
 	for (i = 0; i < size; ++i) {
 		p = &se_ops[i];
 		if ((p->op & data) == p->op && (p->mask & data) == data) {
-			vle_t* ret = (vle_t*) calloc(1, sizeof(vle_t));
 			ret->name = p->name;
 			ret->size = 2;
 			for (j = 0; j < p->n; ++j) {
@@ -794,7 +829,7 @@ static vle_t *find_se(const ut8* buffer) {
 	return NULL;
 }
 
-int vle_init(vle_handle* handle, const ut8* buffer, const ut32 size) {
+int vle_init(vle_handle* handle, const uint8_t* buffer, const uint32_t size) {
 	if (!handle || !buffer || size < 2) {
 		return 1;
 	}
@@ -804,34 +839,34 @@ int vle_init(vle_handle* handle, const ut8* buffer, const ut32 size) {
 	return 0;
 }
 
-vle_t* vle_next(vle_handle* handle) {
+int vle_next(vle_handle* handle, vle_t* ret) {
 	vle_t *op = NULL;
 	if (!handle || handle->pos + handle->inc >= handle->end) {
-		return NULL;
+		return 0;
 	}
 	handle->pos += handle->inc;
 	// ppc subset, e(32 bits) and then se(16 bits)
 
 	if (handle->pos + 4 <= handle->end) {
-		op = find_ppc (handle->pos);
+		op = find_ppc (handle->pos, ret);
 	}
 	if (!op && handle->pos + 4 <= handle->end) {
-		op = find_e (handle->pos);
+		op = find_e (handle->pos, ret);
 	}
 	if (!op && handle->pos + 2 <= handle->end) {
-		op = find_se (handle->pos);
+		op = find_se (handle->pos, ret);
 	}
 
 	handle->inc = op ? op->size : 0;
-	return op;
+  return 1;
 }
 
 void vle_free(vle_t* instr) {
 	free (instr);
 }
 
-void vle_snprint(char* str, int size, ut64 addr, vle_t* instr) {
-	ut32 i;
+void vle_snprint(char* str, int size, uint64_t addr, vle_t* instr) {
+	uint32_t i;
 	int bufsize = size, add = 0;
 	add = snprintf (str, bufsize, "%s", instr->name);
 	for (i = 0; add > 0 && i < instr->n && add < bufsize; ++i) {

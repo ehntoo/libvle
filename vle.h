@@ -7,40 +7,38 @@
 	extern "C" {
 #endif
 
-typedef uint8_t ut8;
-typedef uint16_t ut16;
-typedef uint32_t ut32;
-typedef uint64_t ut64;
-
-#define TYPE_NONE 0
-#define TYPE_REG  1
-#define TYPE_IMM  2
-#define TYPE_MEM  3
-#define TYPE_JMP  4
-#define TYPE_CR   5
+enum field_type {
+  TYPE_NONE = 0,
+  TYPE_REG  = 1,
+  TYPE_IMM  = 2,
+  TYPE_MEM  = 3,
+  TYPE_JMP  = 4,
+  TYPE_CR   = 5
+};
 
 typedef struct {
-	const ut8* end;
-	const ut8* pos;
-	ut16 inc;
+	const uint8_t* end;
+	const uint8_t* pos;
+	uint16_t inc;
 } vle_handle;
 
 typedef struct {
-	ut32 value;
-	ut16 type;
+	uint32_t value;
+	enum field_type type;
 } vle_field_t;
 
 typedef struct {
 	const char* name;
 	vle_field_t fields[10];
-	ut16 n;
-	ut16 size;
+	uint16_t n;
+	uint16_t size;
+  uint32_t op;
+  int cond;
 } vle_t;
 
-int vle_init(vle_handle* handle, const ut8* buffer, const ut32 size);
-vle_t* vle_next(vle_handle* handle);
-void vle_free(vle_t* instr);
-void vle_snprint(char* str, int size, ut64 addr, vle_t* instr);
+int vle_init(vle_handle* handle, const uint8_t* buffer, const uint32_t size);
+int vle_next(vle_handle* handle, vle_t* out);
+void vle_snprint(char* str, int size, uint64_t addr, vle_t* instr);
 
 #ifdef __cplusplus
 }
