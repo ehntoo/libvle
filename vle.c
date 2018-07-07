@@ -111,6 +111,9 @@ typedef struct {
 
 const ppc_t ppc_ops[] = {
 //  { "name"       , op        , mask                    , type   ,   op_type           , COND_AL, {TYPE_REG, TYPE_REG, TYPE_REG, TYPE_REG, TYPE_REG}}
+// 0 1 1 1 1 1 rD rA rB OE 1 0                0 0 0 1                0 1 0 Rc
+// 0 1 1 1 1 1 rD rA rB OE 0 0                0 1 0 1                0 0 0 Rc
+
   { "add"        , 0x7C000214, 0x7C000214 | F_MASK_XO  ,    F_XO,   OP_TYPE_ADD, COND_AL, {TYPE_REG, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
   { "add."       , 0x7C000214, 0x7C000215 | F_MASK_XO  ,    F_XO,   OP_TYPE_ADD, COND_AL, {TYPE_REG, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
   { "addo"       , 0x7C000214, 0x7C000614 | F_MASK_XO  ,    F_XO,   OP_TYPE_ADD, COND_AL, {TYPE_REG, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
@@ -386,8 +389,8 @@ const se_vle_t se_ops[] = {
   { "se_mfar"   , 0x0300, 0x03FF, 2,   OP_TYPE_MOV, COND_AL, {{0x00F0,  4,  0,  8, 1, TYPE_REG}, {0x000F,  0,  0,  0,  0, TYPE_REG}, {0}, {0}, {0}}},
   { "se_add"    , 0x0400, 0x04FF, 2,   OP_TYPE_ADD, COND_AL, {{0x00F0,  4,  0,  0, 1, TYPE_REG}, {0x000F,  0,  0,  0,  0, TYPE_REG}, {0}, {0}, {0}}},
   { "se_mullw"  , 0x0500, 0x05FF, 2,   OP_TYPE_MUL, COND_AL, {{0x00F0,  4,  0,  0, 1, TYPE_REG}, {0x000F,  0,  0,  0,  0, TYPE_REG}, {0}, {0}, {0}}},
-  { "se_sub"    , 0x0600, 0x06FF, 2,   OP_TYPE_SUB, COND_AL, {{0x00F0,  4,  0,  0, 0, TYPE_REG}, {0x000F,  0,  0,  0,  2, TYPE_REG}, {0}, {0}, {0}}},
-  { "se_subf"   , 0x0700, 0x07FF, 2,   OP_TYPE_SUB, COND_AL, {{0x00F0,  4,  0,  0, 0, TYPE_REG}, {0x000F,  0,  0,  0,  2, TYPE_REG}, {0}, {0}, {0}}},
+  { "se_sub"    , 0x0600, 0x06FF, 2,   OP_TYPE_SUB, COND_AL, {{0x00F0,  4,  0,  0, 0, TYPE_REG}, {0x000F,  0,  0,  0,  1, TYPE_REG}, {0}, {0}, {0}}},
+  { "se_subf"   , 0x0700, 0x07FF, 2,   OP_TYPE_SUB, COND_AL, {{0x00F0,  4,  0,  0, 0, TYPE_REG}, {0x000F,  0,  0,  0,  1, TYPE_REG}, {0}, {0}, {0}}},
   { "se_cmp"    , 0x0C00, 0x0CFF, 2,   OP_TYPE_CMP, COND_AL, {{0x00F0,  4,  0,  0, 1, TYPE_REG}, {0x000F,  0,  0,  0,  0, TYPE_REG}, {0}, {0}, {0}}},
   { "se_cmpl"   , 0x0D00, 0x0DFF, 2,   OP_TYPE_CMP, COND_AL, {{0x00F0,  4,  0,  0, 1, TYPE_REG}, {0x000F,  0,  0,  0,  0, TYPE_REG}, {0}, {0}, {0}}},
   { "se_cmph"   , 0x0E00, 0x0EFF, 2,   OP_TYPE_CMP, COND_AL, {{0x00F0,  4,  0,  0, 1, TYPE_REG}, {0x000F,  0,  0,  0,  0, TYPE_REG}, {0}, {0}, {0}}},
