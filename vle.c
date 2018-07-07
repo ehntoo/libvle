@@ -908,7 +908,7 @@ void vle_free(vle_t* instr) {
   free (instr);
 }
 
-void vle_snprint(char* str, int size, uint64_t addr, vle_t* instr) {
+void vle_snprint(char* str, int size, uint32_t addr, vle_t* instr) {
   uint32_t i;
   int bufsize = size, add = 0;
   add = snprintf (str, bufsize, "%s", instr->name);
