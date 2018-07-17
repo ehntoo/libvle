@@ -24,7 +24,8 @@ enum e_encoding_type {
   E_LI20  = 13,
   E_M     = 14,
   E_XCR   = 15,
-  E_XLSP  = 16
+  E_XLSP  = 16,
+  E_XRA   = 17,
 };
 
 #define E_MASK_X    0x03FFF800
@@ -390,16 +391,16 @@ const e_vle_t e_ops[] = {
   { "e_or2is"    , 0x7000D000, 0x7000D000 | E_MASK_I16L, E_I16LS,    OP_TYPE_OR, COND_AL, {TYPE_REG, TYPE_IMM, TYPE_IMM, TYPE_NONE, TYPE_NONE}},
   { "e_ori"      , 0x1800D000, 0x1800D000 | E_MASK_SCI8, E_SCI8 ,    OP_TYPE_OR, COND_AL, {TYPE_REG, TYPE_REG, TYPE_IMM, TYPE_IMM, TYPE_IMM}},
   { "e_ori."     , 0x1800D800, 0x1800D800 | E_MASK_SCI8, E_SCI8 ,    OP_TYPE_OR, COND_AL, {TYPE_REG, TYPE_REG, TYPE_IMM, TYPE_IMM, TYPE_IMM}},
-  { "e_rlw"      , 0x7C000230, 0x7C000230 | E_MASK_X   , E_X    ,   OP_TYPE_SHR, COND_AL, {TYPE_REG, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
-  { "e_rlw."     , 0x7C000231, 0x7C000231 | E_MASK_X   , E_X    ,   OP_TYPE_SHR, COND_AL, {TYPE_REG, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
-  { "e_rlwi"     , 0x7C000270, 0x7C000270 | E_MASK_X   , E_X    ,   OP_TYPE_SHR, COND_AL, {TYPE_REG, TYPE_REG, TYPE_IMM, TYPE_NONE, TYPE_NONE}},
-  { "e_rlwi."    , 0x7C000271, 0x7C000271 | E_MASK_X   , E_X    ,   OP_TYPE_SHR, COND_AL, {TYPE_REG, TYPE_REG, TYPE_IMM, TYPE_NONE, TYPE_NONE}},
+  { "e_rlw"      , 0x7C000230, 0x7C000230 | E_MASK_X   , E_XRA  ,   OP_TYPE_ROR, COND_AL, {TYPE_REG, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
+  { "e_rlw."     , 0x7C000231, 0x7C000231 | E_MASK_X   , E_XRA  ,   OP_TYPE_ROR, COND_AL, {TYPE_REG, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
+  { "e_rlwi"     , 0x7C000270, 0x7C000270 | E_MASK_X   , E_XRA  ,   OP_TYPE_ROR, COND_AL, {TYPE_REG, TYPE_REG, TYPE_IMM, TYPE_NONE, TYPE_NONE}},
+  { "e_rlwi."    , 0x7C000271, 0x7C000271 | E_MASK_X   , E_XRA  ,   OP_TYPE_ROR, COND_AL, {TYPE_REG, TYPE_REG, TYPE_IMM, TYPE_NONE, TYPE_NONE}},
   { "e_rlwimi"   , 0x74000000, 0x74000000 | E_MASK_M   , E_M    ,   OP_TYPE_ROR, COND_AL, {TYPE_REG, TYPE_REG, TYPE_IMM, TYPE_IMM, TYPE_IMM}},
   { "e_rlwinm"   , 0x74000001, 0x74000001 | E_MASK_M   , E_M    ,   OP_TYPE_ROR, COND_AL, {TYPE_REG, TYPE_REG, TYPE_IMM, TYPE_IMM, TYPE_IMM}},
-  { "e_slwi"     , 0x7C000070, 0x7C000070 | E_MASK_X   , E_X    ,   OP_TYPE_SHL, COND_AL, {TYPE_REG, TYPE_REG, TYPE_IMM, TYPE_NONE, TYPE_NONE}},
-  { "e_slwi."    , 0x7C000071, 0x7C000071 | E_MASK_X   , E_X    ,   OP_TYPE_SHL, COND_AL, {TYPE_REG, TYPE_REG, TYPE_IMM, TYPE_NONE, TYPE_NONE}},
-  { "e_srwi"     , 0x7C000470, 0x7C000470 | E_MASK_X   , E_X    ,   OP_TYPE_SHL, COND_AL, {TYPE_REG, TYPE_REG, TYPE_IMM, TYPE_NONE, TYPE_NONE}},
-  { "e_srwi."    , 0x7C000471, 0x7C000471 | E_MASK_X   , E_X    ,   OP_TYPE_SHL, COND_AL, {TYPE_REG, TYPE_REG, TYPE_IMM, TYPE_NONE, TYPE_NONE}},
+  { "e_slwi"     , 0x7C000070, 0x7C000070 | E_MASK_X   , E_XRA  ,   OP_TYPE_SHL, COND_AL, {TYPE_REG, TYPE_REG, TYPE_IMM, TYPE_NONE, TYPE_NONE}},
+  { "e_slwi."    , 0x7C000071, 0x7C000071 | E_MASK_X   , E_XRA  ,   OP_TYPE_SHL, COND_AL, {TYPE_REG, TYPE_REG, TYPE_IMM, TYPE_NONE, TYPE_NONE}},
+  { "e_srwi"     , 0x7C000470, 0x7C000470 | E_MASK_X   , E_XRA  ,   OP_TYPE_SHR, COND_AL, {TYPE_REG, TYPE_REG, TYPE_IMM, TYPE_NONE, TYPE_NONE}},
+  { "e_srwi."    , 0x7C000471, 0x7C000471 | E_MASK_X   , E_XRA  ,   OP_TYPE_SHR, COND_AL, {TYPE_REG, TYPE_REG, TYPE_IMM, TYPE_NONE, TYPE_NONE}},
   { "e_stb"      , 0x34000000, 0x34000000 | E_MASK_D   , E_D    , OP_TYPE_STORE, COND_AL, {TYPE_REG, TYPE_MEM, TYPE_IMM, TYPE_NONE, TYPE_NONE}},
   { "e_stbu"     , 0x18000400, 0x18000400 | E_MASK_D8  , E_D8   , OP_TYPE_STORE, COND_AL, {TYPE_REG, TYPE_MEM, TYPE_REG, TYPE_NONE, TYPE_NONE}},
   { "e_sth"      , 0x5C000000, 0x5C000000 | E_MASK_D   , E_D    , OP_TYPE_STORE, COND_AL, {TYPE_REG, TYPE_MEM, TYPE_REG, TYPE_NONE, TYPE_NONE}},
@@ -529,9 +530,20 @@ static void set_e_fields(vle_t * v, const e_vle_t* p, uint32_t data) {
     case E_X:
     {
       v->n = 3;
-      v->fields[0].value = (data & 0x3E00000) >> 24;
+      v->fields[0].value = (data & 0x3E00000) >> 21;
       v->fields[0].type = p->types[0];
       v->fields[1].value = (data & 0x1F0000) >> 16;
+      v->fields[1].type = p->types[1];
+      v->fields[2].value = (data & 0xF800) >> 11;
+      v->fields[2].type = p->types[2];
+    }
+      break;
+    case E_XRA:
+    {
+      v->n = 3;
+      v->fields[0].value = (data & 0x1F0000) >> 16;
+      v->fields[0].type = p->types[0];
+      v->fields[1].value = (data & 0x3E00000) >> 21;
       v->fields[1].type = p->types[1];
       v->fields[2].value = (data & 0xF800) >> 11;
       v->fields[2].type = p->types[2];
@@ -778,10 +790,10 @@ static void set_ppc_fields(vle_t * v, const ppc_t* p, uint32_t data) {
     case F_XRA:
     {
       v->n = 3;
-      v->fields[1].value = (data & 0x3E00000) >> 21;
-      v->fields[1].type = p->types[0];
       v->fields[0].value = (data & 0x1F0000) >> 16;
-      v->fields[0].type = p->types[1];
+      v->fields[0].type = p->types[0];
+      v->fields[1].value = (data & 0x3E00000) >> 21;
+      v->fields[1].type = p->types[1];
       v->fields[2].value = (data & 0xF800) >> 11;
       v->fields[2].type = p->types[2];
     }
