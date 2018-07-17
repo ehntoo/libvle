@@ -504,7 +504,7 @@ const se_vle_t se_ops[] = {
   { "se_cmpi"   , 0x2A00, 0x2BFF, 2,   OP_TYPE_CMP, COND_AL, {{0x01F0,  4,  0,  0, 1, TYPE_IMM}, {0x000F,  0,  0,  0,  0, TYPE_REG}, {0}, {0}, {0}}},
   { "se_cmpli"  , 0x2200, 0x23FF, 2,   OP_TYPE_CMP, COND_AL, {{0x01F0,  4,  0,  1, 1, TYPE_IMM}, {0x000F,  0,  0,  0,  0, TYPE_REG}, {0}, {0}, {0}}},
   { "se_lbz"    , 0x8000, 0x8FFF, 3,  OP_TYPE_LOAD, COND_AL, {{0x0F00,  6,  0,  0, 2, TYPE_MEM}, {0x00F0,  4,  0,  0,  0, TYPE_REG}, {0x000F,  0,  0,  0,  1, TYPE_MEM}, {0}, {0}}},
-  { "se_lbh"    , 0xA000, 0xAFFF, 3,  OP_TYPE_LOAD, COND_AL, {{0x0F00,  6,  0,  0, 2, TYPE_MEM}, {0x00F0,  4,  0,  0,  0, TYPE_REG}, {0x000F,  0,  0,  0,  1, TYPE_MEM}, {0}, {0}}},
+  { "se_lhz"    , 0xA000, 0xAFFF, 3,  OP_TYPE_LOAD, COND_AL, {{0x0F00,  6,  0,  0, 2, TYPE_MEM}, {0x00F0,  4,  0,  0,  0, TYPE_REG}, {0x000F,  0,  0,  0,  1, TYPE_MEM}, {0}, {0}}},
   { "se_li"     , 0x4800, 0x4FFF, 2,   OP_TYPE_MOV, COND_AL, {{0x07F0,  4,  0,  0, 1, TYPE_IMM}, {0x000F,  0,  0,  0,  0, TYPE_REG}, {0}, {0}, {0}}},
   { "se_lwz"    , 0xC000, 0xCFFF, 3,  OP_TYPE_LOAD, COND_AL, {{0x0F00,  6,  0,  0, 2, TYPE_MEM}, {0x00F0,  4,  0,  0,  0, TYPE_REG}, {0x000F,  0,  0,  0,  1, TYPE_MEM}, {0}, {0}}},
   { "se_or"     , 0x4400, 0x44FF, 2,    OP_TYPE_OR, COND_AL, {{0x00F0,  4,  0,  0, 1, TYPE_REG}, {0x000F,  0,  0,  0,  0, TYPE_REG}, {0}, {0}, {0}}},
