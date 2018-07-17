@@ -964,6 +964,10 @@ static vle_t *find_se(const uint8_t* buffer, vle_t* ret) {
               ret->fields[j].value = (ret->fields[j].value & 0x7) + 24;
             } else if (p->fields[k].type == TYPE_JMP && ret->fields[j].value & 0x0100) {
               ret->fields[j].value = 0xFFFFFE00 | ret->fields[j].value;
+            } else if (p->fields[k].type == TYPE_MEM && ret->fields[j-1].type == TYPE_MEM && ret->fields[j-1].value & 0x8) {
+              // this fixes up the r0-r7/r24-r31 on the previous register-based part of this offset
+              // yes, it's ugly as sin.
+              ret->fields[j-1].value = (ret->fields[j-1].value & 0x7) + 24;
             }
             ret->fields[j].type = p->fields[k].type;
             break;
