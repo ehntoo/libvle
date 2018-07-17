@@ -695,11 +695,11 @@ static void set_e_fields(vle_t * v, const e_vle_t* p, uint32_t data) {
     case E_LI20:
     {
       v->n = 2;
-      v->fields[0].value = (data & 0x3E00000) >> 21;
+      v->fields[0].value = (data & 0x03E00000) >> 21;
       v->fields[0].type = p->types[0];
-      v->fields[1].value = ((data & 0x1F0000) >> 5);
+      v->fields[1].value = ((data & 0x001F0000) >> 5);
       v->fields[1].value |= ((data & 0x7800) << 5);
-      v->fields[1].value |= (data & 0x3FF);
+      v->fields[1].value |= (data & 0x7FF);
       v->fields[1].type = p->types[1];
       if (v->fields[1].value & 0x80000) {
         v->fields[1].value = 0xFFF00000 | v->fields[1].value;
