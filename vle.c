@@ -54,7 +54,8 @@ enum f_encoding_type {
   F_XFX  = 10,
   F_XER  = 11,
   F_MFPR = 12,
-  F_MTPR = 13
+  F_MTPR = 13,
+  F_XRA  = 14
 };
 
 #define F_MASK_X     0x03FFF800
@@ -159,16 +160,16 @@ const ppc_t ppc_ops[] = {
   { "wrteei"     , 0x7C000146, 0x7C000146 | F_MASK_X   ,     F_X,   OP_TYPE_MOV, COND_AL, {TYPE_NONE, TYPE_NONE, TYPE_IMM, TYPE_NONE, TYPE_NONE}},
 
 
-  { "and"        , 0x7C000038, 0x7C000038 | F_MASK_X   ,     F_X,   OP_TYPE_AND, COND_AL, {TYPE_REG, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
-  { "and."       , 0x7C000038, 0x7C000039 | F_MASK_X   ,     F_X,   OP_TYPE_AND, COND_AL, {TYPE_REG, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
-  { "andc"       , 0x7C000078, 0x7C000078 | F_MASK_X   ,     F_X,   OP_TYPE_AND, COND_AL, {TYPE_REG, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
-  { "andc."      , 0x7C000078, 0x7C000079 | F_MASK_X   ,     F_X,   OP_TYPE_AND, COND_AL, {TYPE_REG, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
-  { "or"         , 0x7C000378, 0x7C000378 | F_MASK_X   ,     F_X,    OP_TYPE_OR, COND_AL, {TYPE_REG, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
-  { "or."        , 0x7C000378, 0x7C000379 | F_MASK_X   ,     F_X,    OP_TYPE_OR, COND_AL, {TYPE_REG, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
-  { "xor"        , 0x7C000278, 0x7C000278 | F_MASK_X   ,     F_X,   OP_TYPE_XOR, COND_AL, {TYPE_REG, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
-  { "xor."       , 0x7C000278, 0x7C000279 | F_MASK_X   ,     F_X,   OP_TYPE_XOR, COND_AL, {TYPE_REG, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
-  { "nor"        , 0x7C0000f8, 0x7C0000f8 | F_MASK_X   ,     F_X,   OP_TYPE_NOR, COND_AL, {TYPE_REG, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
-  { "nor."       , 0x7C0000f8, 0x7C0000f9 | F_MASK_X   ,     F_X,   OP_TYPE_NOR, COND_AL, {TYPE_REG, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
+  { "and"        , 0x7C000038, 0x7C000038 | F_MASK_X   ,   F_XRA,   OP_TYPE_AND, COND_AL, {TYPE_REG, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
+  { "and."       , 0x7C000038, 0x7C000039 | F_MASK_X   ,   F_XRA,   OP_TYPE_AND, COND_AL, {TYPE_REG, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
+  { "andc"       , 0x7C000078, 0x7C000078 | F_MASK_X   ,   F_XRA,   OP_TYPE_AND, COND_AL, {TYPE_REG, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
+  { "andc."      , 0x7C000078, 0x7C000079 | F_MASK_X   ,   F_XRA,   OP_TYPE_AND, COND_AL, {TYPE_REG, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
+  { "or"         , 0x7C000378, 0x7C000378 | F_MASK_X   ,   F_XRA,    OP_TYPE_OR, COND_AL, {TYPE_REG, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
+  { "or."        , 0x7C000378, 0x7C000379 | F_MASK_X   ,   F_XRA,    OP_TYPE_OR, COND_AL, {TYPE_REG, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
+  { "xor"        , 0x7C000278, 0x7C000278 | F_MASK_X   ,   F_XRA,   OP_TYPE_XOR, COND_AL, {TYPE_REG, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
+  { "xor."       , 0x7C000278, 0x7C000279 | F_MASK_X   ,   F_XRA,   OP_TYPE_XOR, COND_AL, {TYPE_REG, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
+  { "nor"        , 0x7C0000f8, 0x7C0000f8 | F_MASK_X   ,   F_XRA,   OP_TYPE_NOR, COND_AL, {TYPE_REG, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
+  { "nor."       , 0x7C0000f8, 0x7C0000f9 | F_MASK_X   ,   F_XRA,   OP_TYPE_NOR, COND_AL, {TYPE_REG, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
   { "brinc"      , 0x1000020F, 0x1000020F | F_MASK_EVX ,   F_EVX,    OP_TYPE_OR, COND_AL, {TYPE_REG, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
   { "cmp"        , 0x7C000000, 0x7C000000 | F_MASK_CMP ,   F_CMP,   OP_TYPE_CMP, COND_AL, {TYPE_CR, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
   { "cmpl"       , 0x7C000040, 0x7C000040 | F_MASK_CMP ,   F_CMP,   OP_TYPE_CMP, COND_AL, {TYPE_CR, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
@@ -772,6 +773,17 @@ static void set_ppc_fields(vle_t * v, const ppc_t* p, uint32_t data) {
         v->fields[v->n].type = p->types[2];
         v->n++;
       }
+    }
+      break;
+    case F_XRA:
+    {
+      v->n = 3;
+      v->fields[1].value = (data & 0x3E00000) >> 21;
+      v->fields[1].type = p->types[0];
+      v->fields[0].value = (data & 0x1F0000) >> 16;
+      v->fields[0].type = p->types[1];
+      v->fields[2].value = (data & 0xF800) >> 11;
+      v->fields[2].type = p->types[2];
     }
       break;
     case F_CMP:
