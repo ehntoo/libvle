@@ -26,6 +26,7 @@ enum e_encoding_type {
   E_XCR   = 15,
   E_XLSP  = 16,
   E_XRA   = 17,
+  E_IA16U = 18,
 };
 
 #define E_MASK_X    0x03FFF800
@@ -359,11 +360,11 @@ const e_vle_t e_ops[] = {
   { "e_cmp16i"   , 0x70009800, 0x70009800 | E_MASK_IA16, E_IA16 ,   OP_TYPE_CMP, COND_AL, {TYPE_IMM, TYPE_REG, TYPE_IMM, TYPE_NONE, TYPE_NONE}},
   { "e_cmph16i"  , 0x7000B000, 0x7000B000 | E_MASK_IA16, E_IA16 ,   OP_TYPE_CMP, COND_AL, {TYPE_IMM, TYPE_REG, TYPE_IMM, TYPE_NONE, TYPE_NONE}},
   { "e_cmph"     , 0x7C00001C, 0x7C00001D | E_MASK_X   , E_XCR  ,   OP_TYPE_CMP, COND_AL, {TYPE_CR, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
-  { "e_cmphl16i" , 0x7000B800, 0x7000B800 | E_MASK_IA16, E_IA16 ,   OP_TYPE_CMP, COND_AL, {TYPE_IMM, TYPE_REG, TYPE_IMM, TYPE_NONE, TYPE_NONE}},
+  { "e_cmphl16i" , 0x7000B800, 0x7000B800 | E_MASK_IA16, E_IA16U,   OP_TYPE_CMP, COND_AL, {TYPE_IMM, TYPE_REG, TYPE_IMM, TYPE_NONE, TYPE_NONE}},
   { "e_cmphl"    , 0x7C00005C, 0x7C00005D | E_MASK_X   , E_XCR  ,   OP_TYPE_CMP, COND_AL, {TYPE_CR, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
   { "e_cmpli"    , 0x1880A800, 0x1880A800 | E_MASK_SCI8, E_SCI8 ,   OP_TYPE_CMP, COND_AL, {TYPE_CR, TYPE_REG, TYPE_IMM, TYPE_IMM, TYPE_IMM}},
   { "e_cmpi"     , 0x1800A800, 0x1800A800 | E_MASK_SCI8, E_SCI8 ,   OP_TYPE_CMP, COND_AL, {TYPE_CR, TYPE_REG, TYPE_IMM, TYPE_IMM, TYPE_IMM}},
-  { "e_cmpl16i"  , 0x7000A800, 0x7000A800 | E_MASK_IA16, E_IA16 ,   OP_TYPE_CMP, COND_AL, {TYPE_IMM, TYPE_REG, TYPE_IMM, TYPE_NONE, TYPE_NONE}},
+  { "e_cmpl16i"  , 0x7000A800, 0x7000A800 | E_MASK_IA16, E_IA16U,   OP_TYPE_CMP, COND_AL, {TYPE_IMM, TYPE_REG, TYPE_IMM, TYPE_NONE, TYPE_NONE}},
   { "e_crand"    , 0x7C000202, 0x7C000202 | E_MASK_XL  , E_XL   ,   OP_TYPE_AND, COND_AL, {TYPE_CR, TYPE_CR, TYPE_CR, TYPE_NONE, TYPE_NONE}},
   { "e_crandc"   , 0x7C000102, 0x7C000102 | E_MASK_XL  , E_XL   ,   OP_TYPE_AND, COND_AL, {TYPE_CR, TYPE_CR, TYPE_CR, TYPE_NONE, TYPE_NONE}},
   { "e_creqv"    , 0x7C000242, 0x7C000242 | E_MASK_XL  , E_XL   ,   OP_TYPE_AND, COND_AL, {TYPE_CR, TYPE_CR, TYPE_CR, TYPE_NONE, TYPE_NONE}},
@@ -589,6 +590,7 @@ static void set_e_fields(vle_t * v, const e_vle_t* p, uint32_t data) {
     }
       break;
     case E_IA16:
+    case E_IA16U:
     case E_I16A:
     {
       v->n = 2;
@@ -597,7 +599,7 @@ static void set_e_fields(vle_t * v, const e_vle_t* p, uint32_t data) {
       v->fields[0].value = (data & 0x1F0000) >> 16;
       v->fields[0].type = p->types[1];
       v->fields[1].value |= (data & 0x7FF);
-      if (v->fields[1].value & 0x8000) {
+      if (v->fields[1].value & 0x8000 && p->type != E_IA16U) {
         v->fields[1].value = 0xFFFF0000 | v->fields[1].value;
       }
     }
