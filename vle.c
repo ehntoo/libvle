@@ -27,6 +27,7 @@ enum e_encoding_type {
   E_XLSP  = 16,
   E_XRA   = 17,
   E_IA16U = 18,
+  E_SCI8CR= 19,
 };
 
 #define E_MASK_X    0x03FFF800
@@ -362,8 +363,8 @@ const e_vle_t e_ops[] = {
   { "e_cmph"     , 0x7C00001C, 0x7C00001D | E_MASK_X   , E_XCR  ,   OP_TYPE_CMP, COND_AL, {TYPE_CR, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
   { "e_cmphl16i" , 0x7000B800, 0x7000B800 | E_MASK_IA16, E_IA16U,   OP_TYPE_CMP, COND_AL, {TYPE_IMM, TYPE_REG, TYPE_IMM, TYPE_NONE, TYPE_NONE}},
   { "e_cmphl"    , 0x7C00005C, 0x7C00005D | E_MASK_X   , E_XCR  ,   OP_TYPE_CMP, COND_AL, {TYPE_CR, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
-  { "e_cmpli"    , 0x1880A800, 0x1880A800 | E_MASK_SCI8, E_SCI8 ,   OP_TYPE_CMP, COND_AL, {TYPE_CR, TYPE_REG, TYPE_IMM, TYPE_IMM, TYPE_IMM}},
-  { "e_cmpi"     , 0x1800A800, 0x1800A800 | E_MASK_SCI8, E_SCI8 ,   OP_TYPE_CMP, COND_AL, {TYPE_CR, TYPE_REG, TYPE_IMM, TYPE_IMM, TYPE_IMM}},
+  { "e_cmpli"    , 0x1880A800, 0x1880A800 | E_MASK_SCI8, E_SCI8CR,  OP_TYPE_CMP, COND_AL, {TYPE_CR, TYPE_REG, TYPE_IMM, TYPE_IMM, TYPE_IMM}},
+  { "e_cmpi"     , 0x1800A800, 0x1800A800 | E_MASK_SCI8, E_SCI8CR,  OP_TYPE_CMP, COND_AL, {TYPE_CR, TYPE_REG, TYPE_IMM, TYPE_IMM, TYPE_IMM}},
   { "e_cmpl16i"  , 0x7000A800, 0x7000A800 | E_MASK_IA16, E_IA16U,   OP_TYPE_CMP, COND_AL, {TYPE_IMM, TYPE_REG, TYPE_IMM, TYPE_NONE, TYPE_NONE}},
   { "e_crand"    , 0x7C000202, 0x7C000202 | E_MASK_XL  , E_XL   ,   OP_TYPE_AND, COND_AL, {TYPE_CR, TYPE_CR, TYPE_CR, TYPE_NONE, TYPE_NONE}},
   { "e_crandc"   , 0x7C000102, 0x7C000102 | E_MASK_XL  , E_XL   ,   OP_TYPE_AND, COND_AL, {TYPE_CR, TYPE_CR, TYPE_CR, TYPE_NONE, TYPE_NONE}},
@@ -605,10 +606,14 @@ static void set_e_fields(vle_t * v, const e_vle_t* p, uint32_t data) {
     }
       break;
     case E_SCI8:
+    case E_SCI8CR:
     {
       v->n = 3;
       v->fields[0].value = (data & 0x3E00000) >> 21;
       v->fields[0].type = p->types[0];
+      if (p->type == E_SCI8CR) {
+        v->fields[0].value &= 0x3;
+      }
       v->fields[1].value = (data & 0x1F0000) >> 16;
       v->fields[1].type = p->types[1];
       uint32_t ui8 = data & 0xFF;
