@@ -704,9 +704,9 @@ static void set_e_fields(vle_t * v, const e_vle_t* p, uint32_t data) {
       v->n = 2;
       v->fields[0].value = (data & 0xC0000) >> 18;
       v->fields[0].type = p->types[0];
-      v->fields[1].value = data & 0xFFE;
-      if (v->fields[1].value & 0x800) {
-        v->fields[1].value |= 0xFFFFF000;
+      v->fields[1].value = data & 0xFFFE;
+      if (v->fields[1].value & 0x8000) {
+        v->fields[1].value |= 0xFFFF0000;
       }
       v->fields[1].type = p->types[1];
     }
