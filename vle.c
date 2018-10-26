@@ -382,6 +382,7 @@ const e_vle_t e_ops[] = {
   { "e_lhz"      , 0x58000000, 0x58000000 | E_MASK_D   , E_D    ,  OP_TYPE_LOAD, COND_AL, {TYPE_REG, TYPE_MEM, TYPE_REG, TYPE_NONE, TYPE_NONE}},
   { "e_lhzu"     , 0x18000100, 0x18000100 | E_MASK_D8  , E_D8   ,  OP_TYPE_LOAD, COND_AL, {TYPE_REG, TYPE_MEM, TYPE_REG, TYPE_NONE, TYPE_NONE}},
   { "e_li"       , 0x70000000, 0x70000000 | E_MASK_LI20, E_LI20 ,   OP_TYPE_MOV, COND_AL, {TYPE_REG, TYPE_IMM, TYPE_NONE, TYPE_NONE, TYPE_NONE}},
+
   { "e_lis"      , 0x7000E000, 0x7000E000 | E_MASK_I16L, E_I16LS,   OP_TYPE_MOV, COND_AL, {TYPE_REG, TYPE_IMM, TYPE_IMM, TYPE_NONE, TYPE_NONE}},
   { "e_lmw"      , 0x18000800, 0x18000800 | E_MASK_D8  , E_D8   ,   OP_TYPE_MUL, COND_AL, {TYPE_REG, TYPE_MEM, TYPE_REG, TYPE_NONE, TYPE_NONE}},
   { "e_lwz"      , 0x50000000, 0x53000000 | E_MASK_D   , E_D    ,  OP_TYPE_LOAD, COND_AL, {TYPE_REG, TYPE_MEM, TYPE_REG, TYPE_NONE, TYPE_NONE}},
@@ -682,10 +683,8 @@ static void set_e_fields(vle_t * v, const e_vle_t* p, uint32_t data) {
       v->fields[0].value = (data & 0x3E00000) >> 21;
       v->fields[0].type = p->types[0];
       v->fields[1].value = (data & 0x1F0000) >> 5;
-      v->fields[1].value |= (data & 0x3FF);
-      if (v->fields[1].value & 0x8000) {
-        v->fields[1].value = 0xFFF8000 | v->fields[1].value;
-      }
+      v->fields[1].value |= (data & 0x7FF);
+      v->fields[1].value = v->fields[1].value;
       v->fields[1].type = p->types[1];
     }
       break;
