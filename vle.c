@@ -906,7 +906,8 @@ static void set_ppc_fields(vle_t * v, const ppc_t* p, uint32_t data) {
       v->n = 2;
       v->fields[0].value = (data & 0x1E00000) >> 21;
       v->fields[0].type = p->types[0];
-      v->fields[1].value = (data & 0x1FF800) >> 11;
+      /* v->fields[1].value = (data & 0x1FF800) >> 11; */
+      v->fields[1].value = ((data & 0x1f0000) >> 16) | ((data & 0xf800) >> 6);
       v->fields[1].type = p->types[1];
       break;
     }
@@ -916,7 +917,7 @@ static void set_ppc_fields(vle_t * v, const ppc_t* p, uint32_t data) {
       //inverted
       v->fields[1].value = (data & 0x1E00000) >> 21;
       v->fields[1].type = p->types[1];
-      v->fields[0].value = (data & 0x1FF800) >> 11;
+      v->fields[0].value = ((data & 0x1f0000) >> 16) | ((data & 0xf800) >> 6);
       v->fields[0].type = p->types[0];
     }
       break;
