@@ -58,7 +58,8 @@ enum f_encoding_type {
   F_XER  = 11,
   F_MFPR = 12,
   F_MTPR = 13,
-  F_XRA  = 14
+  F_XRA  = 14,
+  F_X_2  = 15
 };
 
 #define F_MASK_X     0x03FFF800
@@ -176,10 +177,10 @@ const ppc_t ppc_ops[] = {
   { "brinc"      , 0x1000020F, 0x1000020F | F_MASK_EVX ,   F_EVX,    OP_TYPE_OR, COND_AL, {TYPE_REG, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
   { "cmp"        , 0x7C000000, 0x7C000000 | F_MASK_CMP ,   F_CMP,   OP_TYPE_CMP, COND_AL, {TYPE_CR, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
   { "cmpl"       , 0x7C000040, 0x7C000040 | F_MASK_CMP ,   F_CMP,   OP_TYPE_CMP, COND_AL, {TYPE_CR, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
-  { "cntlzd"     , 0x7C000074, 0x7C000074 | F_MASK_X   ,     F_X,   OP_TYPE_AND, COND_AL, {TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE, TYPE_NONE}},
-  { "cntlzd."    , 0x7C000074, 0x7C000075 | F_MASK_X   ,     F_X,   OP_TYPE_AND, COND_AL, {TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE, TYPE_NONE}},
-  { "cntlzw"     , 0x7C000034, 0x7C000034 | F_MASK_X   ,     F_X,   OP_TYPE_AND, COND_AL, {TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE, TYPE_NONE}},
-  { "cntlzw."    , 0x7C000034, 0x7C000035 | F_MASK_X   ,     F_X,   OP_TYPE_AND, COND_AL, {TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE, TYPE_NONE}},
+  { "cntlzd"     , 0x7C000074, 0x7C000074 | F_MASK_X   ,   F_X_2,   OP_TYPE_AND, COND_AL, {TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE, TYPE_NONE}},
+  { "cntlzd."    , 0x7C000074, 0x7C000075 | F_MASK_X   ,   F_X_2,   OP_TYPE_AND, COND_AL, {TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE, TYPE_NONE}},
+  { "cntlzw"     , 0x7C000034, 0x7C000034 | F_MASK_X   ,   F_X_2,   OP_TYPE_AND, COND_AL, {TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE, TYPE_NONE}},
+  { "cntlzw."    , 0x7C000034, 0x7C000035 | F_MASK_X   ,   F_X_2,   OP_TYPE_AND, COND_AL, {TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE, TYPE_NONE}},
   { "dcba"       , 0x7C0005EC, 0x7C0005EC | F_MASK_X   ,     F_X,    OP_TYPE_IO, COND_AL, {TYPE_NONE, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
   { "dcbf"       , 0x7C0000AC, 0x7C0000AC | F_MASK_DCBF,  F_DCBF,    OP_TYPE_IO, COND_AL, {TYPE_IMM, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
   { "dcbfep"     , 0x7C0000FE, 0x7C0000FE | F_MASK_DCBF,  F_DCBF,    OP_TYPE_IO, COND_AL, {TYPE_IMM, TYPE_REG, TYPE_REG, TYPE_NONE, TYPE_NONE}},
@@ -784,6 +785,26 @@ static void set_ppc_fields(vle_t * v, const ppc_t* p, uint32_t data) {
       if (p->types[1] != TYPE_NONE) {
         v->fields[v->n].value = (data & 0x1F0000) >> 16;
         v->fields[v->n].type = p->types[1];
+        v->n++;
+      }
+      if (p->types[2] != TYPE_NONE) {
+        v->fields[v->n].value = (data & 0xF800) >> 11;
+        v->fields[v->n].type = p->types[2];
+        v->n++;
+      }
+    }
+      break;
+    case F_X_2:
+    {
+      v->n = 0;
+      if (p->types[1] != TYPE_NONE) {
+        v->fields[v->n].value = (data & 0x1F0000) >> 16;
+        v->fields[v->n].type = p->types[1];
+        v->n++;
+      }
+      if (p->types[0] != TYPE_NONE) {
+        v->fields[v->n].value = (data & 0x3E00000) >> 21;
+        v->fields[v->n].type = p->types[0];
         v->n++;
       }
       if (p->types[2] != TYPE_NONE) {
